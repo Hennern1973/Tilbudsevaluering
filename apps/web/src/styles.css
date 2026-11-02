@@ -1,0 +1,101 @@
+:root {
+  --bakgrunn: #f6f7f9;
+  --flate: #ffffff;
+  --tekst: #1d2330;
+  --dempet: #5d6575;
+  --kant: #d9dde4;
+  --aksent: #1f5fa8;
+  --fra-tilbud: #1f5fa8;
+  --fra-tilbud-bg: #e8f0fb;
+  --forutsetning: #6b5300;
+  --forutsetning-bg: #fff4c2;
+  --feil: #a32020;
+  --feil-bg: #fdecec;
+  --varsel-bg: #fff6e0;
+  --ok: #1e7a3c;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bakgrunn);
+  color: var(--tekst);
+  font: 14px/1.45 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+a { color: var(--aksent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1 { font-size: 20px; margin: 0 0 4px; }
+h2 { font-size: 15px; margin: 0; }
+.dempet { color: var(--dempet); }
+.tall { text-align: right; font-variant-numeric: tabular-nums; }
+
+.topp {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 16px; background: #17324f; color: #fff;
+}
+.topp .logo { color: #fff; font-weight: 600; }
+.topp .lenke { color: #cfe0f5; }
+main { padding: 16px; max-width: 1600px; margin: 0 auto; }
+
+.brodsmuler { font-size: 13px; color: var(--dempet); margin-bottom: 6px; }
+.sidehode { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+.knapper { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+.seksjon { background: var(--flate); border: 1px solid var(--kant); border-radius: 6px; padding: 12px; margin-bottom: 14px; }
+.seksjon-hode { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; flex-wrap: wrap; }
+
+button {
+  font: inherit; padding: 5px 12px; border-radius: 4px; border: 1px solid var(--kant);
+  background: #fff; cursor: pointer;
+}
+button:hover:not(:disabled) { border-color: var(--aksent); }
+button.primar { background: var(--aksent); border-color: var(--aksent); color: #fff; }
+button:disabled { opacity: 0.5; cursor: default; }
+button.lenke { border: 0; background: none; padding: 0 4px; color: var(--aksent); }
+button.fare { color: var(--feil); }
+
+input, select, textarea { font: inherit; padding: 4px 6px; border: 1px solid var(--kant); border-radius: 4px; background: #fff; }
+textarea { width: 100%; min-height: 60px; }
+label { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--dempet); }
+label > input, label > select, label > textarea { color: var(--tekst); font-size: 14px; }
+.skjema { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+.skjema label { min-width: 140px; }
+
+.feil { background: var(--feil-bg); color: var(--feil); border: 1px solid #f2c3c3; padding: 8px 10px; border-radius: 4px; margin-bottom: 10px; }
+.varsler { list-style: none; padding: 0; margin: 0; }
+.varsler li { background: var(--varsel-bg); border-left: 4px solid #d99a00; padding: 6px 10px; margin-bottom: 4px; border-radius: 2px; }
+.ok-tekst { color: var(--ok); }
+
+/* Kildefarger, samme som i Excel-malene */
+.fra-tilbud { color: var(--fra-tilbud); background: var(--fra-tilbud-bg); }
+.forutsetning { color: var(--forutsetning); background: var(--forutsetning-bg); }
+.ag-cell.fra-tilbud, .ag-cell.forutsetning { font-weight: 500; }
+.kontrollavvik { color: var(--feil); font-weight: 600; }
+.forklaring { display: flex; gap: 10px; font-size: 12px; flex-wrap: wrap; }
+.forklaring span { padding: 2px 6px; border-radius: 3px; }
+
+.ag-row-pinned { font-weight: 600; }
+.grid { width: 100%; }
+
+.nokkeltall { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; }
+.nokkeltall div { background: #f1f4f8; border-radius: 4px; padding: 8px 10px; }
+.nokkeltall b { display: block; font-size: 18px; font-variant-numeric: tabular-nums; }
+.nokkeltall span { font-size: 12px; color: var(--dempet); }
+
+.kort { border: 1px solid var(--kant); border-radius: 6px; padding: 10px; margin-bottom: 10px; background: #fff; }
+.kort-hode { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center; }
+.merke { display: inline-block; font-size: 12px; padding: 1px 6px; border-radius: 10px; background: #e9edf3; color: var(--dempet); }
+.merke.rod { background: var(--feil-bg); color: var(--feil); }
+.merke.gronn { background: #e3f4e8; color: var(--ok); }
+table.enkel { border-collapse: collapse; width: 100%; font-size: 13px; }
+table.enkel th, table.enkel td { border-bottom: 1px solid var(--kant); padding: 4px 6px; text-align: left; vertical-align: top; }
+table.enkel td.tall, table.enkel th.tall { text-align: right; }
+
+dialog { border: 1px solid var(--kant); border-radius: 6px; padding: 16px; max-width: 560px; width: 90vw; }
+dialog::backdrop { background: rgba(0, 0, 0, 0.3); }
+
+@media (max-width: 700px) {
+  main { padding: 10px; }
+  .skjema label { min-width: 100%; }
+}

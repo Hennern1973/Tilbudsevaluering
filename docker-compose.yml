@@ -1,0 +1,16 @@
+# Lokal database for test og utvikling. Krever Docker Desktop (eller Podman).
+# Start: npm run db:start   Stopp: docker compose stop
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tilbud
+      POSTGRES_PASSWORD: tilbud
+      POSTGRES_DB: tilbud
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - tilbud-data:/var/lib/postgresql/data
+volumes:
+  tilbud-data:
