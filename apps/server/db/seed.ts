@@ -67,7 +67,7 @@ export async function seedEksempel(db: Db, app: FastifyInstance, lagring: Dokume
 
   await db.query(
     `insert into bruker (navn, epost) values ('Kari Kalkulatør', $1), ('Sidemann Sverre', 'sidemann@eksempel.no')
-     on conflict (epost) do nothing`,
+     on conflict (epost) do update set navn = excluded.navn`,
     [KALKULATOR],
   );
   const bruker = (await en<{ id: string }>(db, 'select id from bruker where epost = $1', [KALKULATOR]))!;

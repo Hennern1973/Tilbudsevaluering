@@ -28,6 +28,14 @@ export class UtviklingsAuth implements Autentisering {
   async hentBruker(req: FastifyRequest): Promise<Bruker | null> {
     const header = req.headers['x-bruker-epost'];
     const epost = (Array.isArray(header) ? header[0] : header) ?? this.standardEpost;
-    return en<Bruker>(this.db, 'select id, navn, epost from bruker where epost = $1 and aktiv', [epost]);
+    const bruker = await en<Bruker>(this.db, 'select id, navn, epost from bruker where epost = $1 and aktiv', [epost]);
+    if (bruker || epost !== this.standardEpost) return bruker;
+    // Tom database (uten seed): standardbrukeren opprettes, så appen kan tas i bruk med en gang.
+    return en<Bruker>(
+      this.db,
+      `insert into bruker (navn, epost) values ($1, $2) on conflict (epost) do update set aktiv = bruker.aktiv
+       returning id, navn, epost`,
+      [epost.split('@')[0] ?? epost, epost],
+    );
   }
 }

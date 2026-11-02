@@ -31,39 +31,65 @@ Arbeidsflyten er prosjekt → fagkapitler → forespørsler og tilbud → evalue
 - **Excel-eksport** i samme layout som «Tilbudssammendrag» (A1:L65 med lenkerad 65). Arkene «Forutsetninger» og «Justeringer» er med for sporbarhet.
 - **Rutenett** (AG Grid) der du kan lime inn fra Excel med Ctrl+V og kopiere med Ctrl+C.
 
-## Kjøre lokalt
+## Teste på egen PC (uten server)
 
-Du trenger Node.js 20 eller nyere og PostgreSQL 14 eller nyere.
+Den enkleste måten å teste på er å kjøre alt på din egen PC. Appen og databasen kjører da lokalt, og bare du (eller kolleger på samme nettverk, hvis du vil) kommer til. Det koster ingenting og kan flyttes til en server senere uten endringer i koden.
+
+**Én gang:**
+
+1. Installer **Node.js 22 LTS** fra [nodejs.org](https://nodejs.org).
+2. Installer en database. Velg én av to:
+   - **Docker Desktop** ([docker.com](https://www.docker.com/products/docker-desktop/)). Da startes databasen med én kommando: `npm run db:start`. Merk at Docker Desktop krever betalt lisens i firmaer med over 250 ansatte eller over 10 mill. USD i omsetning.
+   - **PostgreSQL for Windows** ([postgresql.org/download/windows](https://www.postgresql.org/download/windows/)). Velg et passord for brukeren `postgres` under installasjonen. Åpne deretter «SQL Shell (psql)» og kjør:
+     ```sql
+     create user tilbud with password 'tilbud';
+     create database tilbud owner tilbud;
+     ```
+3. Last ned koden (grønn «Code»-knapp på GitHub → «Download ZIP», eller `git clone`) og åpne en terminal (PowerShell) i mappen.
+4. Kjør:
+   ```bash
+   npm install
+   copy apps\server\.env.eksempel apps\server\.env     # macOS/Linux: cp apps/server/.env.eksempel apps/server/.env
+   npm run db:migrer
+   npm run db:seed        # valgfritt: fiktivt prosjekt 26-900 med 17.1 Taktekking
+   ```
+
+**Hver gang:**
 
 ```bash
-# 1. Database
-createdb tilbudsevaluering
-
-# 2. Innstillinger
-cp apps/server/.env.eksempel apps/server/.env
-#    Rediger DATABASE_URL i apps/server/.env hvis nødvendig
-
-# 3. Avhengigheter, tabeller og eksempeldata
-npm install
-npm run db:migrer
-npm run db:seed        # fiktivt prosjekt 26-900 med 17.1 Taktekking og fire tilbydere
-
-# 4. Start (i to terminaler)
-npm run dev:server     # API på http://127.0.0.1:3001
-npm run dev:web        # nettside på http://localhost:5173
+npm start
 ```
+
+Åpne [http://localhost:3001](http://localhost:3001). Kommandoen bygger nettsiden og starter serveren, som da serverer både nettsiden og API-et fra samme adresse. Stopp med Ctrl+C.
+
+**La kolleger teste:** Sett `HOST=0.0.0.0` i `apps/server/.env` og start på nytt. Kolleger på samme nettverk åpner `http://<ditt-PC-navn>:3001`. Windows-brannmuren spør første gang om Node.js skal få tilgang. Innloggingen er fortsatt utviklingsinnlogging uten passord, så dette er bare for testing med fiktive eller ufarlige data.
+
+Data lagres i databasen og opplastede dokumenter i mappen `data/dokumenter`. Begge blir liggende til du sletter dem.
+
+## Utvikling
+
+Under utvikling er det greit å kjøre server og nettside hver for seg, så endringer vises med en gang:
+
+```bash
+npm run dev:server     # API på http://127.0.0.1:3001, starter på nytt ved endringer
+npm run dev:web        # nettside på http://localhost:5173, oppdateres ved endringer
+```
+
+**Innlogging i utvikling:** Appen bruker brukeren i `DEV_BRUKER_EPOST`, og oppretter den selv hvis databasen er tom. Klikk «bytt» øverst til høyre for å bytte, f.eks. til `sidemann@eksempel.no` (finnes etter `npm run db:seed`). Innloggingen er et utbyttbart lag (`apps/server/src/auth.ts`), så Entra ID kan settes inn uten å endre resten.
 
 Eksempeldataene inneholder fire tilbydere til 17.1 Taktekking. Én leverte etter fristen, og én har forbehold om endringer fra detaljprosjekteringen. En femte tilbyder regner ikke. Alle navn er fiktive.
 
-**Innlogging i utvikling:** Appen bruker brukeren i `DEV_BRUKER_EPOST`. Klikk «bytt» øverst til høyre for å bytte, f.eks. til `sidemann@eksempel.no`. Innloggingen er et utbyttbart lag (`apps/server/src/auth.ts`), så Entra ID kan settes inn uten å endre resten.
+## Senere: egen server
 
-### Tester
+Når en server er tilgjengelig, er det samme oppsett: Node.js, PostgreSQL og `npm start`, med `HOST=0.0.0.0` og et ekte domene foran. Er firmaet på Microsoft 365, passer **Azure App Service + Azure Database for PostgreSQL** godt, fordi Entra ID-innloggingen og SharePoint da ligger i samme miljø. Før appen tas i bruk med ekte tilbud, må Entra ID-innloggingen være på plass (fase 4).
+
+## Tester
 
 ```bash
 npm test -w packages/beregning                  # beregningsregler (ingen database)
 
 createdb tilbud_test
-TEST_DATABASE_URL=postgres://localhost/tilbud_test npm test -w apps/server   # API mot ekte Postgres
+TEST_DATABASE_URL=postgres://tilbud:tilbud@localhost/tilbud_test npm test -w apps/server   # API mot ekte Postgres
 ```
 
 Testene for beregningsmodulen bruker taktekking-eksempelet med kjente fasitsvar:

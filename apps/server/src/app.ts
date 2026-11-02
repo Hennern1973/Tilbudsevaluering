@@ -1,4 +1,6 @@
+import { existsSync } from 'node:fs';
 import multipart from '@fastify/multipart';
+import fastifyStatic from '@fastify/static';
 import Fastify, { type FastifyInstance, type FastifyRequest } from 'fastify';
 import { ZodError } from 'zod';
 import { type Autentisering, type Bruker, UtviklingsAuth } from './auth.js';
@@ -21,6 +23,8 @@ export interface AppAvhengigheter {
   auth?: Autentisering;
   lagring?: DokumentLagring;
   logger?: boolean;
+  /** Mappe med ferdigbygd nettside. Når den finnes, serveres nettsiden fra samme adresse som API-et. */
+  webmappe?: string;
 }
 
 export interface Ctx {
@@ -77,5 +81,14 @@ export async function byggApp(avh: AppAvhengigheter): Promise<FastifyInstance> {
   await prosjektRuter(app, ctx);
   await tilbudRuter(app, ctx);
   await evalueringRuter(app, ctx);
+
+  if (avh.webmappe && existsSync(avh.webmappe)) {
+    await app.register(fastifyStatic, { root: avh.webmappe });
+    // Sider i nettleseren (/prosjekter/…, /fag/…) skal alle laste index.html.
+    app.setNotFoundHandler((req, reply) => {
+      if (req.method === 'GET' && !req.url.startsWith('/api/')) return reply.sendFile('index.html');
+      return reply.code(404).send({ feil: 'Finnes ikke' });
+    });
+  }
   return app;
 }
